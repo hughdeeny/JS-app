@@ -1,0 +1,8 @@
+---
+import TripPageLayout from '../../components/TripPageLayout.astro';
+import { tripPages } from '../../data/site';
+
+const trip = tripPages.find((t) => t.slug === 'boat-trips')!;
+---
+
+<TripPageLayout trip={trip} />
