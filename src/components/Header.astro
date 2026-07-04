@@ -42,22 +42,42 @@ import { navLinks, WHATSAPP_URL, FACEBOOK_URL, INSTAGRAM_URL } from '../data/sit
 </header>
 
 <script>
+  const header = document.querySelector('.header');
   const toggle = document.querySelector('.header__toggle');
   const nav = document.querySelector('.header__nav');
   const links = document.querySelectorAll('.header__link');
 
-  toggle?.addEventListener('click', () => {
-    const open = nav?.classList.toggle('is-open');
+  const setOpen = (open: boolean) => {
+    if (!nav || !toggle) return;
+    nav.classList.toggle('is-open', open);
+    toggle.classList.toggle('is-active', open);
     toggle.setAttribute('aria-expanded', String(open));
     toggle.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+  };
+
+  toggle?.addEventListener('click', (event) => {
+    event.stopPropagation();
+    setOpen(!nav?.classList.contains('is-open'));
   });
 
   links.forEach((link) => {
-    link.addEventListener('click', () => {
-      nav?.classList.remove('is-open');
-      toggle?.setAttribute('aria-expanded', 'false');
-      toggle?.setAttribute('aria-label', 'Open menu');
-    });
+    link.addEventListener('click', () => setOpen(false));
+  });
+
+  // Close when tapping outside the header
+  document.addEventListener('click', (event) => {
+    if (
+      nav?.classList.contains('is-open') &&
+      header &&
+      !header.contains(event.target as Node)
+    ) {
+      setOpen(false);
+    }
+  });
+
+  // Close on Escape
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') setOpen(false);
   });
 </script>
 
@@ -93,20 +113,37 @@ import { navLinks, WHATSAPP_URL, FACEBOOK_URL, INSTAGRAM_URL } from '../data/sit
     display: flex;
     flex-direction: column;
     justify-content: center;
+    align-items: center;
     gap: 5px;
-    width: 2.5rem;
-    height: 2.5rem;
-    padding: 0.5rem;
+    width: 2.75rem;
+    height: 2.75rem;
+    padding: 0.6rem;
     border-radius: var(--radius-sm);
     background: var(--sand);
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+    z-index: 101;
   }
 
   .header__toggle span {
     display: block;
+    width: 1.35rem;
     height: 2px;
     background: var(--ocean-deep);
     border-radius: 2px;
-    transition: transform 0.2s ease;
+    transition: transform 0.25s ease, opacity 0.2s ease;
+  }
+
+  .header__toggle.is-active span:nth-child(1) {
+    transform: translateY(7px) rotate(45deg);
+  }
+
+  .header__toggle.is-active span:nth-child(2) {
+    opacity: 0;
+  }
+
+  .header__toggle.is-active span:nth-child(3) {
+    transform: translateY(-7px) rotate(-45deg);
   }
 
   .header__nav {
